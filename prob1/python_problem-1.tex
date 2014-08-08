@@ -1,0 +1,358 @@
+\documentclass[10pt, letterpaper, acro-macros]{python-problem}
+
+\usepackage{url}
+
+\problemset{1}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Rules}
+
+This exercise can be performed completely within \code{ipython} with out the
+pylab extension. \emph{At no point can you store what Bill says! You cannot
+edit Bill either; that would be cruel}. All interactions must be through
+talking with him. The following are invalid.
+
+\begin{pycode*}{gobble=2}
+  a = talkToBill()
+  talkToBill().some_function() # Bill's output is temporarily stored in a chain.
+  talkToBill().some_property   # See above.
+\end{pycode*}
+
+All of the code problems (except the \textsc{rpn} calculator) can be solved
+in one legible line of code (ignoring import statements). This means
+\code{def} is not required, but also not an invalid solution.
+
+Hints: \url{http://goo.gl/7JRUpU},
+\url{http://goo.gl/frBLtZ}, \url{http://goo.gl/QGjZ7k}.
+
+
+\section*{Problem}
+
+Bill is a travelling salesman with a briefcase filled with goodies that he
+is attempting to sell to you. However, Bill is a strange character. He only
+seems to accept programming statements, and only one line expressions at
+that. What can I say, \textsc{cs} people are kinda \emph{weird}.
+
+Your only interface to Bill is the \code{talkToBill} function, and you
+forgot a notepad so you can't write down what he says (see above).
+
+When you send him no input (google for these answers),
+
+\begin{enumerate}
+  \item What type of data structure does he return? Write a new function
+    that returns the same data (create a Bill simulator).
+  \item What is the access cost for this type of data structure? Why?
+  \item What is the insert cost for this type of data structure? Why?
+  \item What are the properties that index must hold when
+    inserting an element into this data structure? Why?
+  \item What other scenarios would this data structure be useful for?
+\end{enumerate}
+
+You begin to wonder some profound mathematics questions to yourself. You
+decide to ask Bill, keeping in mind that he only accepts one statement
+inputs (an example is given in the help of \code{talkToBill}).
+
+\begin{enumerate}[resume]
+  \item ``What is Bill's default input?''
+  \item ``What items can I get from Bill?'' (in sorted order)
+  \item ``If I chose one of each item from Bill, how much would that
+    cost?''
+  \item ``Can I get Bill to return a list of tuples, where the tuple
+    contains the item and the cost?''
+\end{enumerate}
+
+Bill is so predictable. In fact, this makes him very vulnerable. He can do
+all sorts of things, if you just ask in the right way.
+
+\begin{enumerate}[resume]
+  \item How can you get him to write out your name?
+  \item Make him tell you ``NAME is pretty'' for any input name.
+  \item How can you get him to print out the date?
+\end{enumerate}
+
+You want to ask him more complicated questions but sadly forgot your pad at
+the office. But, being quite the clever programmer, you decide there is an
+alternative way to get him to remember things for you. This opens a world of
+questions that couldn't be asked before (or not easily).
+
+\begin{enumerate}[resume]
+  \item For all the items Bill blabs on about, reverse the name of the item.
+    Additionally, remove all items that are cheaper than \$2. The resulting
+    data type should be the same as when Bill is called with no input.
+  \item Make Bill output both the price and the current date he sold you the
+    item.
+  \item Add five hilarious items to his list.
+  \item For each item, choose a random number between 0 and 10 of that item.
+    How much would that cost? (Additionally, how could you do this in one
+    statement like in the second section?)
+\end{enumerate}
+
+Finally, out of boredom, you decide to turn Bill into a calculator! He
+supports the following operations: \code{+, -, *, /}. You set him up to work
+like a Reverse Polish Notation (\textsc{rpn}) calculator, where he accept a
+list of numbers and operators and returns a result.
+
+
+\section*{Appendix}
+
+Below is the function declaration/help for the \code{talkToBill} function.
+
+\begin{pycode*}{gobble=2}
+  def talkToBill(f):
+      ''' Bill, the weird salesman
+
+      Bill only responds to single statement inputs.
+
+      Parameters
+      ----------
+      f : statement to ask.
+          What do you want to ask Bill?
+
+      Returns
+      -------
+      Depends!
+      '''
+\end{pycode*}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                              Solutions                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\beginsolution
+
+\section*{Solutions}
+
+\begin{enumerate}
+  \item A dictionary. A function that accomplishes the same effect as
+    \code{talkToBill} would be as follows.
+
+    \begin{pycode*}{gobble=6}
+      def billSimulator():
+          return {'cabbage': 2.5, 'aubergine': 3.0,
+                  'pear': 1.5, 'apple': 1.25}
+    \end{pycode*}
+
+
+  \item The access cost is \BigO{1}. This is because the dictionary is really
+    a hash table. See \url{https://en.wikipedia.org/wiki/Hash_table}.
+
+    Briefly, what this means is that there is a hash function which takes an
+    input and returns some output that is within some modulus. This returned
+    value is used as a lookup into an array. If the hash function has
+    constant time to compute, then the lookup is also in constant time since
+    we can access any element in an array in constant time.
+
+    The access of a dictionary can be emulated (in pseudocode) as follows,
+    given that the dictionary acted like a list.
+
+    \begin{pycode*}{gobble=6}
+      def lookup(dictionary, key):
+          return dictionary[hash(key)]
+    \end{pycode*}
+
+
+  \item The insertion cost is \BigO{1}. Similar to the reasoning above,
+    since we can find the insertion point using the hash function in
+    constant time, we can insert an item into that location in constant
+    time. There is a bit of a hick-up related to if two different keys map
+    to the same lookup index value, which is discussed more in detail in the
+    \textsc{url} above.
+
+    The insertion of a dictionary can be emulated (in pseudocode) as follows,
+    given that the dictionary acted like a list.
+
+    \begin{pycode*}{gobble=6}
+      def insert(dictionary, key, item):
+          dictionary[hash(key)].append(item)
+    \end{pycode*}
+
+
+  \item The index must be \emph{immutable}. This means that once the value is
+    created in memory, it cannot be altered, only read. An example of this
+    type of variable is strings, integers, floats, and tuples (why might
+    this property of tuples be amazingly useful?). In addition, the index
+    type must implement the \code{hash} function, which allows the code
+    above to work correctly.
+
+
+  \item Dictionaries are insanely useful in Python. Classes in Python are, at
+    their core, just dictionaries. You can try this out by seeing what dot
+    operations are available on a class. This also means that classes can
+    be mutated after they are created, and that classes can be created
+    programmatically (a technique known as meta-programming).
+
+    Additionally, dictionaries are great ways to store any data as key value
+    pairs. This setup is often used in high performance databases, or for
+    creating simple ways to pass around related parameters in a program.
+
+    Additionally, dictionaries are great ways to store structures like
+    \textsc{xml} and \textsc{json}.
+
+    More information on dictionaries can be found here:
+    \url{http://openbookproject.net/thinkcs/python/english3e/dictionaries.html}
+
+
+  \item By default, the message sent to Bill is the identity function (known
+    as \code{id} in other languages). It is equivalent to the following
+    line.
+
+    \begin{pycode*}{gobble=6}
+      talkToBill(lambda x: x)
+    \end{pycode*}
+
+
+  \item Simply pass the keys of Bill's dictionary to the \code{sorted}
+    function. \url{https://docs.python.org/3.3/howto/sorting.html}
+
+    \begin{pycode*}{gobble=6}
+      talkToBill(lambda x: sorted(x.keys()))
+    \end{pycode*}
+
+
+  \item The result of buying one of each item is \$8.25. Note that the type
+    that \code{x.values} returns is an iterator, which returns the elements
+    of the dictionary one by one. A good reference can be found here:\\
+    \url{http://answers.oreilly.com/topic/1576-new-iterables-in-python-3-0/}
+
+    \begin{pycode*}{gobble=6}
+      talkToBill(lambda x: sum(x.values()))
+    \end{pycode*}
+
+
+  \item This is really a test in list comprehensions. The following lines are
+    equivalent.
+
+    \begin{pycode*}{gobble=6}
+      talkToBill(lambda x: [(k, v) for k, v in x.items()])
+      talkToBill(lambda x: [x for x in x.items()])
+      talkToBill(lambda x: list(x.items()))
+    \end{pycode*}
+
+
+  \item Just ignore the input and replace it with what you want. Note that I
+    use the underscore to represent an unused argument. This is a somewhat
+    common programming practice.
+
+    \begin{pycode*}{gobble=6}
+      talkToBill(lambda _: "ryan")
+    \end{pycode*}
+
+
+  \item Printing an arbitrary name requires a small trick. I said you can't
+    make variables. \emph{Functions} are perfectly OK (we are ignoring
+    that functions are variables at the moment). This trick can be used in
+    problems 12-15.
+
+    \begin{pycode*}{gobble=6}
+      def sayPretty(name): return "{} is pretty".format(name)
+      talkToBill(lambda _: sayPretty("Sussy"))
+    \end{pycode*}
+
+    An different, perhaps more correct solution (since no code is required
+    outside of the \code{talkToBill} call) is to create an anonymous
+    function and call it directly.
+
+    \begin{pycode*}{gobble=6}
+      talkToBill(lambda _: (lambda _, name: "{} is pretty".format(name))(_, "Sussy"))
+    \end{pycode*}
+
+    Note that the \code{sayPretty} function could also be defined by using
+    the \code{\%} operator. However, this is a deprecated feature, and
+    all string formatting should be done with the new \code{str.format}
+    function. See the following \textsc{url} for more details.
+    \url{https://docs.python.org/3.1/library/string.html}
+
+
+  \item The datetime module is a bit screwy, but this is how you could code
+    this. The result of \code{datetime.now} is a datetime object.
+
+    \begin{pycode*}{gobble=6}
+      from datetime import datetime
+      talkToBill(lambda _: datetime.now())
+    \end{pycode*}
+
+
+  \item There are two methods to both filter out and reverse the key
+    strings. The first is to create a new function that will hold
+    intermediaries of two different dictionary comprehensions.
+
+    \begin{pycode*}{gobble=6}
+      def reverse_and_filter(x):
+          filtered = {k: v for k, v in x.items() if v > 2}
+          return {k[::-1]: v for k, v in filtered.items()}
+      talkToBill(lambda x: reverse_and_filter(x))
+    \end{pycode*}
+
+    The second is a slightly advanced dictionary comprehension.
+    \begin{pycode*}{gobble=6}
+      talkToBill(lambda x:
+          { k[::-1]: v for k, v in x.items() if v > 2 } )
+    \end{pycode*}
+
+
+  \item Again, the values can be modified to include a tuple by using a
+    dictionary comprehension.
+
+    \begin{pycode*}{gobble=6}
+      from datetime import datetime
+      talkToBill(lambda x:
+          { k: (v, datetime.now()) for k, v in x.items() } )
+    \end{pycode*}
+
+
+  \item This solution leverages the update function in a dictionary.
+
+    \begin{pycode*}{gobble=6}
+      def addToDict(x):
+          x.update({'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5})
+          return x
+      talkToBill(lambda x: addToDict(x))
+    \end{pycode*}
+
+    Or if you are sadistic:
+
+    \begin{pycode*}{gobble=6}
+      from itertools import chain
+      talkToBill(lambda x:
+        dict(chain(x.items(), {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5}.items())))
+    \end{pycode*}
+
+
+  \item This one can be done in either a more traditional sense.
+
+    \begin{pycode*}{gobble=6}
+      import random
+
+      def sumItems(x):
+          cost = 0
+
+          for v in x.values():
+              cost += random.randint(0, 10) * v
+
+          return cost
+
+      talkToBill(lambda x: sumItems(x))
+    \end{pycode*}
+
+    Or with a generator.
+    \begin{pycode*}{gobble=6}
+      import random
+      talkToBill(lambda x:
+          sum(v*random.randint(0, 10) for v in x.values()))
+    \end{pycode*}
+
+
+  \item To create the \textsc{rpn} calculator, all you need is a stack and
+    the input list (see
+    \url{https://en.wikipedia.org/wiki/Reverse_Polish_notation}). The code
+    is shown below.
+
+    \pyfile{rpn.py}
+
+\end{enumerate}
+
+\end{document}
